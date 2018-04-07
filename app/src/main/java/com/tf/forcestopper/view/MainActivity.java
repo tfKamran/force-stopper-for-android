@@ -2,10 +2,12 @@ package com.tf.forcestopper.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.tf.forcestopper.R;
+import com.tf.forcestopper.model.ApplicationItem;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,11 +16,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        loadMainFragment();
+        loadSplashFragment();
     }
 
-    private void loadMainFragment() {
-        loadFragment(new MainFragment());
+    private void loadSplashFragment() {
+        final SplashFragment fragment = new SplashFragment();
+        fragment.setOnAppsLoadedListener(new SplashFragment.OnAppsLoadedListener() {
+            @Override
+            public void onAppsLoaded(List<ApplicationItem> installedApplications) {
+                loadMainFragment(installedApplications);
+            }
+        });
+
+        loadFragment(fragment);
+    }
+
+    private void loadMainFragment(List<ApplicationItem> installedApplications) {
+        final MainFragment fragment = new MainFragment();
+        fragment.setInstalledApplications(installedApplications);
+
+        loadFragment(fragment);
     }
 
     private void loadFragment(Fragment fragment) {

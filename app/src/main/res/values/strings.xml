@@ -2,4 +2,5 @@
     <string name="app_name">Force Stopper</string>
     <string name="ignored_apps">Ignored apps:</string>
     <string name="force_stop_all">Force Stop All</string>
+    <string name="loading_your_apps">Loading your apps...</string>
 </resources>

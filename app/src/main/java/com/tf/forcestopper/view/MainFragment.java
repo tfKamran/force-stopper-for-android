@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tf.forcestopper.R;
+import com.tf.forcestopper.model.ApplicationItem;
 import com.tf.forcestopper.util.Preferences;
 import com.tf.forcestopper.util.ShellScriptExecutor;
 
@@ -39,6 +40,7 @@ public class MainFragment extends Fragment {
 
     private List<ApplicationItem> mInstalledApplications = new ArrayList<>();
     private List<String> mIgnoredList = new ArrayList<>();
+    private ApplicationAdapter mAdapter;
 
     @Nullable
     @Override
@@ -58,7 +60,8 @@ public class MainFragment extends Fragment {
 
         listIgnoredApplications = view.findViewById(R.id.list_ignored_applications);
         listIgnoredApplications.setLayoutManager(new LinearLayoutManager(getActivity()));
-        loadIgnoreList();
+        mAdapter = new ApplicationAdapter();
+        listIgnoredApplications.setAdapter(mAdapter);
     }
 
     @Override
@@ -75,10 +78,6 @@ public class MainFragment extends Fragment {
         mPreferences.setIgnoredList(mIgnoredList);
     }
 
-    private void loadIgnoreList() {
-        new ApplicationListTask().execute();
-    }
-
     private View.OnClickListener btnStopOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -86,49 +85,11 @@ public class MainFragment extends Fragment {
         }
     };
 
-    private class ApplicationListTask extends AsyncTask<Void, Void, List<ApplicationItem>> {
+    public void setInstalledApplications(List<ApplicationItem> installedApplications) {
+        this.mInstalledApplications = installedApplications;
 
-        private ProgressDialog mProgressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            mProgressDialog = ProgressDialog.show(getActivity(), "Loading Apps",
-                    "Please wait...", true, false);
-        }
-
-        @Override
-        protected List<ApplicationItem> doInBackground(Void... voids) {
-            final List<PackageInfo> installedPackages = mPackageManager.getInstalledPackages(PackageManager.GET_META_DATA);
-            for (PackageInfo installedPackage : installedPackages) {
-                if ((installedPackage.applicationInfo.flags
-                        & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) == 0) {
-                    mInstalledApplications.add(new ApplicationItem(installedPackage));
-                }
-            }
-
-            mInstalledApplications.remove(new ApplicationItem(getActivity().getPackageName()));
-
-            Collections.sort(mInstalledApplications, new Comparator<ApplicationItem>() {
-                @Override
-                public int compare(ApplicationItem o1, ApplicationItem o2) {
-                    return o1.label.compareTo(o2.label);
-                }
-            });
-
-            return mInstalledApplications;
-        }
-
-        @Override
-        protected void onPostExecute(List<ApplicationItem> packageInfoList) {
-            super.onPostExecute(packageInfoList);
-
-            listIgnoredApplications.setAdapter(new ApplicationAdapter());
-
-            if (mProgressDialog != null) {
-                mProgressDialog.dismiss();
-            }
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -170,64 +131,6 @@ public class MainFragment extends Fragment {
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
             }
-        }
-    }
-
-    private class ApplicationItem {
-
-        public final String packageName;
-        public final Drawable icon;
-        public final String label;
-
-        ApplicationItem(PackageInfo installedPackage) {
-            packageName = installedPackage.packageName;
-            icon = getApplicationIcon(packageName);
-            label = getApplicationLabel(installedPackage.applicationInfo);
-        }
-
-        ApplicationItem(String packageName) {
-            this.packageName = packageName;
-            icon = null;
-            label = "";
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj != null
-                    && obj instanceof ApplicationItem
-                    && ((packageName != null && packageName.equals(((ApplicationItem) obj).packageName))
-                    || ((ApplicationItem) obj).packageName == null);
-        }
-
-        private Drawable getApplicationIcon(String packageName) {
-            Drawable applicationIcon;
-
-            try {
-                applicationIcon = mPackageManager.getApplicationIcon(packageName);
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-
-                applicationIcon = getResources().getDrawable(R.drawable.ic_launcher_foreground);
-            }
-
-            return applicationIcon;
-        }
-
-        private String getApplicationLabel(String packageName) {
-            String applicationLabel = "Error";
-
-            try {
-                applicationLabel = getApplicationLabel(mPackageManager.getApplicationInfo(packageName,
-                        PackageManager.GET_META_DATA));
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            return applicationLabel;
-        }
-
-        private String getApplicationLabel(ApplicationInfo applicationInfo) {
-            return mPackageManager.getApplicationLabel(applicationInfo).toString();
         }
     }
 
