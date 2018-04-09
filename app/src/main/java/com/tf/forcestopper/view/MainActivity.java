@@ -3,6 +3,7 @@ package com.tf.forcestopper.view;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.tf.forcestopper.R;
 import com.tf.forcestopper.model.ApplicationItem;
@@ -10,6 +11,10 @@ import com.tf.forcestopper.model.ApplicationItem;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

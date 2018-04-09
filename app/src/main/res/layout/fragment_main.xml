@@ -23,8 +23,10 @@
         android:id="@+id/btn_force_stop_apps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="16dp"
         android:layout_marginTop="16dp"
         android:layout_gravity="center_horizontal"
+        android:background="@drawable/primary_button_selector"
         android:text="@string/force_stop_all" />
 
 </LinearLayout>

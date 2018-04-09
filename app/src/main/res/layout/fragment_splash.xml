@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/splash_background"
     android:orientation="vertical">
 
     <LinearLayout
@@ -27,7 +24,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/app_name"
-            android:textColor="@android:color/white"
             android:textSize="32sp" />
 
     </LinearLayout>
@@ -53,8 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="@string/loading_your_apps"
-            android:textColor="@android:color/white" />
+            android:text="@string/loading_your_apps" />
 
     </LinearLayout>
 
