@@ -102,7 +102,7 @@ public class SplashFragment extends Fragment {
             super.onPostExecute(applicationItems);
 
             if (mOnAppsLoadedListener != null) {
-                mOnAppsLoadedListener.onAppsLoaded(mInstalledApplications);
+                mOnAppsLoadedListener.onAppsLoaded(applicationItems);
             }
         }
     }

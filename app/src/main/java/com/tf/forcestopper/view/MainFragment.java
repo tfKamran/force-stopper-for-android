@@ -1,17 +1,13 @@
 package com.tf.forcestopper.view;
 
 import android.app.ProgressDialog;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
+import android.arch.lifecycle.Observer;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,17 +19,19 @@ import android.widget.TextView;
 import com.tf.forcestopper.R;
 import com.tf.forcestopper.model.ApplicationItem;
 import com.tf.forcestopper.util.Preferences;
-import com.tf.forcestopper.util.ShellScriptExecutor;
+import com.tf.forcestopper.worker.ForceStopWorker;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class MainFragment extends Fragment {
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkStatus;
+
+public class MainFragment extends Fragment implements Observer<WorkStatus> {
 
     private RecyclerView listIgnoredApplications;
+    private ProgressDialog mProgressDialog;
 
     private PackageManager mPackageManager;
     private Preferences mPreferences;
@@ -81,56 +79,33 @@ public class MainFragment extends Fragment {
     private View.OnClickListener btnStopOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            new ForceStopTask().execute();
+            mPreferences.setIgnoredList(mIgnoredList);
+
+            final OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(ForceStopWorker.class)
+                    .build();
+            final WorkManager workManager = WorkManager.getInstance();
+
+            workManager.enqueue(workRequest);
+            mProgressDialog = ProgressDialog.show(getActivity(), getString(R.string.stopping_apps),
+                    getString(R.string.please_wait), true, false);
+
+            workManager.getStatusById(workRequest.getId()).observe(MainFragment.this,
+                    MainFragment.this);
         }
     };
+
+    @Override
+    public void onChanged(@Nullable WorkStatus workStatus) {
+        if (workStatus != null && workStatus.getState().isFinished() && mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+    }
 
     public void setInstalledApplications(List<ApplicationItem> installedApplications) {
         this.mInstalledApplications = installedApplications;
 
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private class ForceStopTask extends AsyncTask<Void, Void, Void> {
-
-        private ProgressDialog mProgressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            mProgressDialog = ProgressDialog.show(getActivity(), "Stopping Apps",
-                    "Please wait...", true, false);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            long startTime = System.currentTimeMillis();
-
-            for (ApplicationItem applicationItem : mInstalledApplications) {
-                try {
-                    if (!mIgnoredList.contains(applicationItem.packageName)) {
-                        ShellScriptExecutor.executeShell("am force-stop --user current " + applicationItem.packageName);
-                    }
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Log.d("---", "force stopped " + mInstalledApplications.size() + " in " + (System.currentTimeMillis() - startTime));
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            if (mProgressDialog != null) {
-                mProgressDialog.dismiss();
-            }
         }
     }
 
