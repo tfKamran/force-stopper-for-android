@@ -65,7 +65,9 @@ public class SplashFragment extends Fragment {
         final Animation progressAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.splash_progress_fade_in);
         progressAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {}
+            public void onAnimationStart(Animation animation) {
+                // Unused
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -73,7 +75,9 @@ public class SplashFragment extends Fragment {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {
+                // Unused
+            }
         });
 
         layoutProgress.startAnimation(progressAnimation);
