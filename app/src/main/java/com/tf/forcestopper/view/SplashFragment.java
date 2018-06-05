@@ -1,6 +1,5 @@
 package com.tf.forcestopper.view;
 
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +14,6 @@ import com.tf.forcestopper.R;
 import com.tf.forcestopper.model.ApplicationItem;
 import com.tf.forcestopper.util.ApplicationsHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SplashFragment extends Fragment {
@@ -23,10 +21,7 @@ public class SplashFragment extends Fragment {
     private View layoutHeader;
     private View layoutProgress;
 
-    private PackageManager mPackageManager;
-
     private OnAppsLoadedListener mOnAppsLoadedListener;
-    private List<ApplicationItem> mInstalledApplications = new ArrayList<>();
 
     @Nullable
     @Override
@@ -42,8 +37,6 @@ public class SplashFragment extends Fragment {
         layoutProgress = view.findViewById(R.id.layout_progress);
 
         animateHeader();
-
-        mPackageManager = getActivity().getPackageManager();
 
         loadInstalledApplications();
     }

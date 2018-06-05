@@ -2,7 +2,6 @@ package com.tf.forcestopper.view;
 
 import android.app.ProgressDialog;
 import android.arch.lifecycle.Observer;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -33,7 +32,6 @@ public class MainFragment extends Fragment implements Observer<WorkStatus> {
     private RecyclerView listIgnoredApplications;
     private ProgressDialog mProgressDialog;
 
-    private PackageManager mPackageManager;
     private Preferences mPreferences;
 
     private List<ApplicationItem> mInstalledApplications = new ArrayList<>();
@@ -50,7 +48,6 @@ public class MainFragment extends Fragment implements Observer<WorkStatus> {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPackageManager = getActivity().getPackageManager();
         mPreferences = new Preferences(getActivity().getApplicationContext());
 
         View btnForceStopApps = view.findViewById(R.id.btn_force_stop_apps);
