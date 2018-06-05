@@ -45,7 +45,9 @@ public class SplashFragment extends Fragment {
         final Animation headerAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.splash_header_fade_in);
         headerAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {}
+            public void onAnimationStart(Animation animation) {
+                // Unused
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -55,7 +57,9 @@ public class SplashFragment extends Fragment {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {
+                // Unused
+            }
         });
 
         layoutHeader.startAnimation(headerAnimation);
