@@ -1,9 +1,6 @@
 package com.tf.forcestopper.view;
 
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,10 +13,9 @@ import android.view.animation.AnimationUtils;
 
 import com.tf.forcestopper.R;
 import com.tf.forcestopper.model.ApplicationItem;
+import com.tf.forcestopper.util.ApplicationsHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class SplashFragment extends Fragment {
@@ -98,26 +94,7 @@ public class SplashFragment extends Fragment {
 
         @Override
         protected List<ApplicationItem> doInBackground(Void... voids) {
-            final List<PackageInfo> installedPackages = mPackageManager.getInstalledPackages(PackageManager.GET_META_DATA);
-            for (PackageInfo installedPackage : installedPackages) {
-                if ((installedPackage.applicationInfo.flags
-                        & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) == 0) {
-                    mInstalledApplications.add(new ApplicationItem(installedPackage.packageName,
-                            getApplicationIcon(installedPackage.packageName),
-                            getApplicationLabel(installedPackage.packageName)));
-                }
-            }
-
-            mInstalledApplications.remove(new ApplicationItem(getActivity().getPackageName()));
-
-            Collections.sort(mInstalledApplications, new Comparator<ApplicationItem>() {
-                @Override
-                public int compare(ApplicationItem o1, ApplicationItem o2) {
-                    return o1.label.compareTo(o2.label);
-                }
-            });
-
-            return mInstalledApplications;
+            return new ApplicationsHelper(getActivity()).getInstalledApplicationItems();
         }
 
         @Override
@@ -128,37 +105,6 @@ public class SplashFragment extends Fragment {
                 mOnAppsLoadedListener.onAppsLoaded(mInstalledApplications);
             }
         }
-    }
-
-    private Drawable getApplicationIcon(String packageName) {
-        Drawable applicationIcon;
-
-        try {
-            applicationIcon = mPackageManager.getApplicationIcon(packageName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-
-            applicationIcon = getResources().getDrawable(R.drawable.ic_launcher_foreground);
-        }
-
-        return applicationIcon;
-    }
-
-    private String getApplicationLabel(String packageName) {
-        String applicationLabel = "Error";
-
-        try {
-            applicationLabel = getApplicationLabel(mPackageManager.getApplicationInfo(packageName,
-                    PackageManager.GET_META_DATA));
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return applicationLabel;
-    }
-
-    private String getApplicationLabel(ApplicationInfo applicationInfo) {
-        return mPackageManager.getApplicationLabel(applicationInfo).toString();
     }
 
     public OnAppsLoadedListener getOnAppsLoadedListener() {
